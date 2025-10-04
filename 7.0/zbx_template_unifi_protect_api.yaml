@@ -1,0 +1,1588 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: d37f71c7e3f7469bab645852a69a2018
+      name: 'Templates/Video surveillance'
+  host_groups:
+    - uuid: f2481361f99448eea617b7b1d4765566
+      name: 'Discovered hosts'
+  templates:
+    - uuid: 670711523156410fb07113d08623ed6f
+      template: 'UniFi Protect API'
+      name: 'UniFi Protect API'
+      description: 'Tested with UniFi Protect API (6.1.78)'
+      groups:
+        - name: 'Templates/Video surveillance'
+      items:
+        - uuid: b51d0012976b400382211f9db8056759
+          name: 'Application Version'
+          type: HTTP_AGENT
+          key: application.version
+          delay: '{$ITEM_APPLICATION.VERSION_UPDATE}'
+          history: '{$ITEM_APPLICATION.VERSION_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.applicationVersion
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/meta/info'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          triggers:
+            - uuid: d07bddb8193c4eb89df1a4ae5348fcc6
+              expression: 'change(/UniFi Protect API/application.version)=1'
+              name: 'Application Version Changed'
+              priority: INFO
+            - uuid: 9d924fcf8555499c9d9727ce584dfb4e
+              expression: 'nodata(/UniFi Protect API/application.version,{$TRIGGER_NODATA})=1'
+              name: 'No Data for {$TRIGGER_NODATA}'
+              priority: HIGH
+        - uuid: 4bd1744a329f4443ba5352d95a5f1bd0
+          name: 'Cameras JSON'
+          type: HTTP_AGENT
+          key: cameras.json
+          delay: '{$ITEM_CAMERAS.JSON_UPDATE}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/cameras'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          tags:
+            - tag: data
+              value: raw
+        - uuid: eb439c0f54774072a9831cfd1d791847
+          name: 'Chimes JSON'
+          type: HTTP_AGENT
+          key: chimes.json
+          delay: '{$ITEM_CHIMES.JSON_UPDATE}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/chimes'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          tags:
+            - tag: data
+              value: raw
+        - uuid: dfe560e2f76d4797a81fb460116a2e3c
+          name: 'Lights JSON'
+          type: HTTP_AGENT
+          key: lights.json
+          delay: '{$ITEM_LIGHTS.JSON_UPDATE}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/lights'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          tags:
+            - tag: data
+              value: raw
+        - uuid: cff7181a14c84eda80adcc250cb71ad8
+          name: 'NVR JSON'
+          type: HTTP_AGENT
+          key: nvrs.json
+          delay: '{$ITEM_NVRS.JSON_UPDATE}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/nvrs'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          tags:
+            - tag: data
+              value: raw
+        - uuid: d5bd194570e54675921492b3b329b5e4
+          name: 'NVR Model Key'
+          type: DEPENDENT
+          key: nvrs.modelKey
+          delay: '0'
+          history: '{$ITEM_NVRS.MODELKEY_HOSTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'The model key of the nvr'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.modelKey
+          master_item:
+            key: nvrs.json
+          triggers:
+            - uuid: 21b0e1fb79014e4baaeb7c805af81589
+              expression: 'change(/UniFi Protect API/nvrs.modelKey)=1'
+              name: 'NVR Model Changed'
+              priority: INFO
+        - uuid: 4a7b5d99c092461d9384fee3f29a6bde
+          name: 'NVR Name'
+          type: DEPENDENT
+          key: nvrs.name
+          delay: '0'
+          history: '{$ITEM_NVRS.NAME_HOSTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'The name of the model'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.name
+          master_item:
+            key: nvrs.json
+          triggers:
+            - uuid: 9d6ad6e2c2c942cda76896985ba5e61c
+              expression: 'change(/UniFi Protect API/nvrs.name)=1'
+              name: 'NVR Name Changed'
+              priority: INFO
+        - uuid: f4805cf27ca4415a8e63aa16bc9b35a4
+          name: 'Sensors JSON'
+          type: HTTP_AGENT
+          key: sensors.json
+          delay: '{$ITEM_SENSORS.JSON_UPDATE}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/sensors'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          tags:
+            - tag: data
+              value: raw
+      discovery_rules:
+        - uuid: f50527f21acc4f4fadc02d1f727eeb45
+          name: 'Discovery Cameras'
+          type: DEPENDENT
+          key: discovery.cameras
+          delay: '0'
+          host_prototypes:
+            - uuid: 2f876724adff476e9a30b8061f9e0185
+              host: '{#ID}'
+              name: 'UniFi Protect Camera - {#NAME}'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+              templates:
+                - name: 'UniFi Protect API - Camera'
+          master_item:
+            key: cameras.json
+          lld_macro_paths:
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#NAME}'
+              path: $.name
+        - uuid: a1aa36cd69584c75ab5592b4b4f4c97e
+          name: 'Discovery Chimes'
+          type: DEPENDENT
+          key: discovery.chimes
+          delay: '0'
+          host_prototypes:
+            - uuid: edcc5207d6454227a00fa16fd1a30cb5
+              host: '{#ID}'
+              name: 'UniFi Protect Chime - {#NAME}'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+              templates:
+                - name: 'UniFi Protect API - Chime'
+          master_item:
+            key: chimes.json
+          lld_macro_paths:
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#NAME}'
+              path: $.name
+        - uuid: 6a4e0be8abea442283b7afc05b0464b3
+          name: 'Discovery Lights'
+          type: DEPENDENT
+          key: discovery.lights
+          delay: '0'
+          host_prototypes:
+            - uuid: 251b89fd2db74c189bfc83f25b3def44
+              host: '{#ID}'
+              name: 'UniFi Protect Light - {#NAME}'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+              templates:
+                - name: 'UniFi Protect API - Light'
+          master_item:
+            key: lights.json
+          lld_macro_paths:
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#NAME}'
+              path: $.name
+        - uuid: 0b1bb7b62566440da36beced346bed80
+          name: 'Discovery Sensors'
+          type: DEPENDENT
+          key: discovery.sensors
+          delay: '0'
+          host_prototypes:
+            - uuid: 3c39609b03e345ecb638abec2291043b
+              host: '{#ID}'
+              name: 'UniFi Protect Sensor - {#NAME}'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+              templates:
+                - name: 'UniFi Protect API - Sensor'
+          master_item:
+            key: sensors.json
+          lld_macro_paths:
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#NAME}'
+              path: $.name
+      macros:
+        - macro: '{$ITEM_APPLICATION.VERSION_HISTORY}'
+          value: 7d
+          description: 'Item ''application.version'' History'
+        - macro: '{$ITEM_APPLICATION.VERSION_UPDATE}'
+          value: 10m
+          description: 'Item ''application.version'' Update Interval'
+        - macro: '{$ITEM_CAMERAS.JSON_UPDATE}'
+          value: 1h
+          description: 'Item ''cameras.json'' Update Interval (Camera Discovery Item)'
+        - macro: '{$ITEM_CHIMES.JSON_UPDATE}'
+          value: 1h
+          description: 'Item ''chimes.json'' Update Interval (Chimes Discovery Item)'
+        - macro: '{$ITEM_LIGHTS.JSON_UPDATE}'
+          value: 1h
+          description: 'Item ''lights.json'' Update Interval (Lights Discovery Item)'
+        - macro: '{$ITEM_NVRS.JSON_UPDATE}'
+          value: 1h
+          description: 'Item ''nvr.json'' Update Interval (NVR Info)'
+        - macro: '{$ITEM_NVRS.MODELKEY_HOSTORY}'
+          value: 7d
+          description: 'Item ''nvr.modelKey'' History'
+        - macro: '{$ITEM_NVRS.NAME_HOSTORY}'
+          value: 7d
+          description: 'Item ''nvr.name'' History'
+        - macro: '{$ITEM_SENSORS.JSON_UPDATE}'
+          value: 1h
+          description: 'Item ''sensors.json'' Update Interval (Sensors Discovery Item)'
+        - macro: '{$TRIGGER_NODATA}'
+          value: 30m
+          description: 'Trigger ''No Data'' after 30 minutes of missing data'
+        - macro: '{$UNIFI_PROTECT_API_ADDRESS}'
+          description: 'UniFi Protect API Address or Dns Name'
+        - macro: '{$UNIFI_PROTECT_API_KEY}'
+          description: 'UniFi Protect API Key'
+    - uuid: 9d5a175f34f0461b9c4b952ebec7ac7d
+      template: 'UniFi Protect API - Camera'
+      name: 'UniFi Protect API - Camera'
+      groups:
+        - name: 'Templates/Video surveillance'
+      items:
+        - uuid: e272a1373a854a30900b2899e30bf7cf
+          name: 'Active Patrol Slot'
+          type: DEPENDENT
+          key: activePatrolSlot
+          delay: '0'
+          history: '{$ITEM_ACTIVEPATROLSLOT_HISTORY}'
+          trends: '0'
+          description: 'The slot number (0-4) of the patrol that is currently running, or null if no patrol is running'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.activePatrolSlot
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: c2f8009ea7cd4cbc96a43a083dde2b55
+              expression: 'change(/UniFi Protect API - Camera/activePatrolSlot)=1'
+              name: 'Active Patrol Slot Changed'
+              priority: INFO
+        - uuid: 8b948fdeef3b4ba5a4c2505724c3c7a0
+          name: 'Detail JSON'
+          type: HTTP_AGENT
+          key: detail.json
+          delay: '{$ITEM_DETAIL.JSON_UPDATE}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/cameras/{HOST.HOST}'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          tags:
+            - tag: data
+              value: raw
+        - uuid: b113471e828c4eeea0f69524a3a754e6
+          name: 'HDR Type'
+          type: DEPENDENT
+          key: hdrType
+          delay: '0'
+          history: '{$ITEM_HDRTYPE_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'High Dynamic Range (HDR) mode setting.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.hdrType
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 1dff2c19c39f4289bde1beaf3ff20741
+              expression: 'change(/UniFi Protect API - Camera/hdrType)=1'
+              name: 'HDR Type Changed'
+              priority: INFO
+        - uuid: ba78a26eafb8411b802f1d6555b5113d
+          name: 'Mic Enabled'
+          type: DEPENDENT
+          key: isMicEnabled
+          delay: '0'
+          history: '{$ITEM_ISMICENABLED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether or not the microphone on camera is enabled'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.isMicEnabled
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 6aa05b12b3b14ea49f64ebdd45c7163b
+              expression: 'change(/UniFi Protect API - Camera/isMicEnabled)=1'
+              name: 'Mic Enabled Changed'
+              priority: INFO
+        - uuid: 098e223065e34953b2ab64d2e21fe933
+          name: 'Lcd Message'
+          type: DEPENDENT
+          key: lcdMessage
+          delay: '0'
+          history: '{$ITEM_LCDMESSAGE_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'object (lcdMessageUnion)'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.lcdMessage
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: cff8ee0e2d3847d4bb01de9ed84fcb89
+              expression: 'change(/UniFi Protect API - Camera/lcdMessage)=1'
+              name: 'Lcd Message Changed'
+              priority: INFO
+        - uuid: cbd49dd9ceb540618fea279ee538410d
+          name: 'Led Enabled'
+          type: DEPENDENT
+          key: ledSettings.isEnabled
+          delay: '0'
+          history: '{$ITEM_ISLEDENABLED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether the LED is enabled.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.ledSettings.isEnabled
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 6e523c66e70946b284d2a6c36fc64a09
+              expression: 'change(/UniFi Protect API - Camera/ledSettings.isEnabled)=1'
+              name: 'Led Enabled Changed'
+              priority: INFO
+        - uuid: 2dd37adae0c24d55a8e395041cc18c97
+          name: 'Mic Volume'
+          type: DEPENDENT
+          key: micVolume
+          delay: '0'
+          history: '{$ITEM_MICVOLUME_HISTORY}'
+          trends: '0'
+          description: 'Mic volume: a number from 0-100.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.micVolume
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: df4211db636c4e9ea01efe1bbe0694b4
+              expression: 'change(/UniFi Protect API - Camera/micVolume)=1'
+              name: 'Mic Volume Changed'
+              priority: INFO
+        - uuid: cdd238d0eedb400da9725951d4181457
+          name: 'OSD Date Enabled'
+          type: DEPENDENT
+          key: osd.isDateEnabled
+          delay: '0'
+          history: '{$ITEM_OSD.ISDATEENABLED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether to show the date in the OSD.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.osdSettings.isDateEnabled
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: c62f610e5f89461593195d1fba9b49dd
+              expression: 'change(/UniFi Protect API - Camera/osd.isDateEnabled)=1'
+              name: 'OSD Date Enabled Changed'
+              priority: INFO
+        - uuid: 6aa5d930c9424f7cbbe5f440f9f6676c
+          name: 'OSD Debug Enabled'
+          type: DEPENDENT
+          key: osd.isDebugEnabled
+          delay: '0'
+          history: '{$ITEM_OSD.ISDEBUGENABLED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether debug info is enabled.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.osdSettings.isDebugEnabled
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: cee8c1604bd64ffe956beb9669c15208
+              expression: 'last(/UniFi Protect API - Camera/osd.isDebugEnabled,{$TRIGGER_OSDDEBUG_WARNING})="true"'
+              name: 'OSD Debug Enabled from {$TRIGGER_OSDDEBUG_WARNING}'
+              priority: WARNING
+        - uuid: 4491d34f310140ab850f0c1e7033bfea
+          name: 'OSD Logo Enabled'
+          type: DEPENDENT
+          key: osd.isLogoEnabled
+          delay: '0'
+          history: '{$ITEM_OSD.ISLOGOENABLED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether to show the logo in the bottom right corner.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.osdSettings.isLogoEnabled
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 78e2ae8ad4254c0dbffcd14b79c40126
+              expression: 'change(/UniFi Protect API - Camera/osd.isLogoEnabled)=1'
+              name: 'OSD Logo Enabled Changed'
+              priority: INFO
+        - uuid: 871bf5e85c1a46159ec778cdb6410c1b
+          name: 'OSD Name Enabled'
+          type: DEPENDENT
+          key: osd.isNameEnabled
+          delay: '0'
+          history: '{$ITEM_OSD.ISNAMEENABLED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether to show the name in the OSD.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.osdSettings.isNameEnabled
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 3c724228a2044128b0cb3018fdc0dca1
+              expression: 'change(/UniFi Protect API - Camera/osd.isNameEnabled)=1'
+              name: 'OSD Name Enabled Changed'
+              priority: INFO
+        - uuid: 22510611987c4860aed22970665b19fc
+          name: 'OSD Overlay Location'
+          type: DEPENDENT
+          key: osd.overlayLocation
+          delay: '0'
+          history: '{$ITEM_OSD.ISOVERLAYLOCATION_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'The location of the overlay on the screen.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.osdSettings.overlayLocation
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 8e2b8469c3624e32a2125ebd6f87df70
+              expression: 'change(/UniFi Protect API - Camera/osd.overlayLocation)=1'
+              name: 'OSD Overlay Location Changed'
+              priority: INFO
+        - uuid: a9d8ae883e8a4c4b8198647ecd240603
+          name: 'Smart Detect Settings'
+          type: DEPENDENT
+          key: smartDetectSettings
+          delay: '0'
+          history: '{$ITEM_SMARTDETECTSETTINGS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Smart detection settings for the camera.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.smartDetectSettings
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 92cc7a8372d24dc684c6a0d427982318
+              expression: 'change(/UniFi Protect API - Camera/smartDetectSettings)=1'
+              name: 'Smart Detect Settings Changed'
+              priority: INFO
+        - uuid: b9efe2a0e8554e41966392784a71f142
+          name: State
+          type: DEPENDENT
+          key: state
+          delay: '0'
+          history: '{$ITEM_STATE_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Connection state of the device.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.state
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 996361abe3c246f09808dc7df6918481
+              expression: 'last(/UniFi Protect API - Camera/state)="CONNECTING"'
+              name: 'State is "CONNECTING"'
+              priority: INFO
+              dependencies:
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+                  expression: 'last(/UniFi Protect API - Camera/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_WARNING}'
+                  expression: 'last(/UniFi Protect API - Camera/state,{$TRIGGER_STATE_CONNETING_WARNING})="CONNECTING"'
+            - uuid: 7d52bd1b637843a19a54cea6dcf471e2
+              expression: 'last(/UniFi Protect API - Camera/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+              name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+              priority: HIGH
+            - uuid: e68428bbdda541c2b0d7fac6856c0db1
+              expression: 'last(/UniFi Protect API - Camera/state,{$TRIGGER_STATE_CONNETING_WARNING})="CONNECTING"'
+              name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_WARNING}'
+              priority: WARNING
+              dependencies:
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+                  expression: 'last(/UniFi Protect API - Camera/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+            - uuid: 048e60c7ba11436db8df7e040550019e
+              expression: 'last(/UniFi Protect API - Camera/state)="DISCONNECTED"'
+              name: 'State is "DISCONNECTED"'
+              priority: HIGH
+        - uuid: 89b0a06da6c04cc9ad98abdf3c2104bb
+          name: 'Video Mode'
+          type: DEPENDENT
+          key: videoMode
+          delay: '0'
+          history: '{$ITEM_VIDEOMODE_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Current video mode of the camera'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.videoMode
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 7cd202d3cc624f84b5d650a29984c66d
+              expression: 'change(/UniFi Protect API - Camera/videoMode)=1'
+              name: 'Video Mode Changed'
+              priority: INFO
+      macros:
+        - macro: '{$ITEM_ACTIVEPATROLSLOT_HISTORY}'
+          value: 7d
+          description: 'Item ''activePatrolSlot'' History'
+        - macro: '{$ITEM_DETAIL.JSON_UPDATE}'
+          value: 10m
+          description: 'Item ''detail.json'' Update Interval'
+        - macro: '{$ITEM_HDRTYPE_HISTORY}'
+          description: 'Item ''hdrType'' History'
+        - macro: '{$ITEM_ISLEDENABLED_HISTORY}'
+          value: 7d
+          description: 'Item ''ledSettings.isEnabled'' History'
+        - macro: '{$ITEM_ISMICENABLED_HISTORY}'
+          value: 7d
+          description: 'Item ''isMicEnabled'' History'
+        - macro: '{$ITEM_LCDMESSAGE_HISTORY}'
+          value: 7d
+          description: 'Item ''lcdMessage'' History'
+        - macro: '{$ITEM_MICVOLUME_HISTORY}'
+          value: 7d
+          description: 'Item ''micVolume'' History'
+        - macro: '{$ITEM_OSD.ISDATEENABLED_HISTORY}'
+          value: 7d
+          description: 'Item ''osd.isDateEnabled'' History'
+        - macro: '{$ITEM_OSD.ISDEBUGENABLED_HISTORY}'
+          value: 7d
+          description: 'Item ''osd.isDebugEnabled'' History'
+        - macro: '{$ITEM_OSD.ISLOGOENABLED_HISTORY}'
+          value: 7d
+          description: 'Item ''osd.isLogoEnabled'' History'
+        - macro: '{$ITEM_OSD.ISNAMEENABLED_HISTORY}'
+          value: 7d
+          description: 'Item ''osd.isNameEnabled'' History'
+        - macro: '{$ITEM_OSD.ISOVERLAYLOCATION_HISTORY}'
+          value: 7d
+          description: 'Item ''osd.overlayLocation'' History'
+        - macro: '{$ITEM_SMARTDETECTSETTINGS_HISTORY}'
+          value: 7d
+          description: 'Item ''smartDetectSettings'' History'
+        - macro: '{$ITEM_STATE_HISTORY}'
+          value: 7d
+          description: 'Item ''state'' History'
+        - macro: '{$ITEM_VIDEOMODE_HISTORY}'
+          value: 7d
+          description: 'Item ''videoMode'' History'
+        - macro: '{$TRIGGER_OSDDEBUG_WARNING}'
+          value: 1h
+          description: 'Trigger ''OSD Debug Enabled from {$TRIGGER_OSDDEBUG_WARNING}'''
+        - macro: '{$TRIGGER_STATE_CONNETING_HIGH}'
+          value: 1h
+          description: 'Trigger ''State is "CONNECTING" from {$TRIGGER_STATE_CONNETING_HIGH}'''
+        - macro: '{$TRIGGER_STATE_CONNETING_WARNING}'
+          value: 30m
+          description: 'Trigger ''State is "CONNECTING" from {$TRIGGER_STATE_CONNETING_WARNING}'''
+    - uuid: 0e99c2ee29d945259ebebb0733b95169
+      template: 'UniFi Protect API - Chime'
+      name: 'UniFi Protect API - Chime'
+      groups:
+        - name: 'Templates/Video surveillance'
+      items:
+        - uuid: a053a5f481a449449013253d58285fed
+          name: 'Camera Ids'
+          type: DEPENDENT
+          key: cameraIds
+          delay: '0'
+          history: '{$ITEM_CAMERAIDS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'The list of (doorbell-only) cameras which this chime is paired to.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.cameraIds
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 5798d258c2f64f168a9e485a00454105
+              expression: 'change(/UniFi Protect API - Chime/cameraIds)=1'
+              name: 'Associated Cameras was Changed'
+              priority: INFO
+        - uuid: dd9d0dcc025c4306a9a4639f63a522be
+          name: 'Detail JSON'
+          type: HTTP_AGENT
+          key: detail.json
+          delay: '{$ITEM_DETAIL.JSON_UPDATE}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/chimes/{HOST.HOST}'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          tags:
+            - tag: data
+              value: raw
+        - uuid: 1e1e56af060945668960c54a3ec010e7
+          name: 'Ring Settings'
+          type: DEPENDENT
+          key: ringSettings
+          delay: '0'
+          history: '{$ITEM_RINGSETTINGS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'List of custom ringtone settings for (doorbell-only) cameras paired to this chime.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.ringSettings
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 6943972d2f2040e2b67faa3eba21e2f7
+              expression: 'change(/UniFi Protect API - Chime/ringSettings)=1'
+              name: 'Ring Settings was Changed'
+              priority: INFO
+        - uuid: 3dad319885ee4093b518523e34f3252f
+          name: State
+          type: DEPENDENT
+          key: state
+          delay: '0'
+          history: '{$ITEM_STATE_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Connection state of the device.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.state
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 1256363382d642c684ef767b31c75377
+              expression: 'last(/UniFi Protect API - Chime/state)="CONNECTING"'
+              name: 'State is "CONNECTING"'
+              priority: INFO
+              dependencies:
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+                  expression: 'last(/UniFi Protect API - Chime/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_WARNING}'
+                  expression: 'last(/UniFi Protect API - Chime/state,{$TRIGGER_STATE_CONNETING_WARNING})="CONNECTING"'
+            - uuid: 6aeba0a74aaf42fda1840944b0d5436e
+              expression: 'last(/UniFi Protect API - Chime/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+              name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+              priority: HIGH
+            - uuid: 4b51eb75e717416885f6dc44dd9936f8
+              expression: 'last(/UniFi Protect API - Chime/state,{$TRIGGER_STATE_CONNETING_WARNING})="CONNECTING"'
+              name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_WARNING}'
+              priority: WARNING
+              dependencies:
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+                  expression: 'last(/UniFi Protect API - Chime/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+            - uuid: ada4c97dc9464810a74a830d5049e91c
+              expression: 'last(/UniFi Protect API - Chime/state)="DISCONNECTED"'
+              name: 'State is "DISCONNECTED"'
+              priority: HIGH
+      macros:
+        - macro: '{$ITEM_CAMERAIDS_HISTORY}'
+          value: 7d
+          description: 'Item ''cameraIds'' History'
+        - macro: '{$ITEM_DETAIL.JSON_UPDATE}'
+          value: 10m
+          description: 'Item ''detail.json'' Update Interval'
+        - macro: '{$ITEM_RINGSETTINGS_HISTORY}'
+          value: 7d
+          description: 'Item ''ringSettings'' History'
+        - macro: '{$ITEM_STATE_HISTORY}'
+          value: 7d
+          description: 'Item ''state'' History'
+        - macro: '{$TRIGGER_STATE_CONNETING_HIGH}'
+          value: 1h
+          description: 'Trigger ''State is "CONNECTING" from {$TRIGGER_STATE_CONNETING_HIGH}'''
+        - macro: '{$TRIGGER_STATE_CONNETING_WARNING}'
+          value: 30m
+          description: 'Trigger ''State is "CONNECTING" from {$TRIGGER_STATE_CONNETING_WARNING}'''
+    - uuid: a36572b00f06412c8e7cedee36ba9ecb
+      template: 'UniFi Protect API - Light'
+      name: 'UniFi Protect API - Light'
+      groups:
+        - name: 'Templates/Video surveillance'
+      items:
+        - uuid: ddf9fe42a64c4be7a6c72fcdb704dcaa
+          name: 'Paired Camera Id'
+          type: DEPENDENT
+          key: camera
+          delay: '0'
+          history: '{$ITEM_ISPIRMOTIONDETECTED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Which camera is configured to be paired to this light.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.camera
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: ad42e9c5956f4a57a3f960c89fb73f68
+              expression: 'change(/UniFi Protect API - Light/camera)=1'
+              name: 'Paired Camera was Changed'
+              priority: INFO
+        - uuid: e34a09528dda41728cbfa3f4f6723eff
+          name: 'Detail JSON'
+          type: HTTP_AGENT
+          key: detail.json
+          delay: '{$ITEM_DETAIL.JSON_UPDATE}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/lights/{HOST.HOST}'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          tags:
+            - tag: data
+              value: raw
+        - uuid: 45657970e1a447b197b57ad6d04deb86
+          name: 'Is Dark'
+          type: DEPENDENT
+          key: isDark
+          delay: '0'
+          history: '{$ITEM_ISDARK_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether the light is currently sensing that it''s in a dark scene.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.isDark
+          master_item:
+            key: detail.json
+        - uuid: d9ae223f20eb48aebb6bb3b1bc357368
+          name: 'Is Light Force Enabled'
+          type: DEPENDENT
+          key: isLightForceEnabled
+          delay: '0'
+          history: '{$ITEM_ISLIGHTFORCEDENABLED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether the light has its main LED currently force-enabled.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.isLightForceEnabled
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: d3e24e0c9be840febbcf1f7358747a02
+              expression: 'last(/UniFi Protect API - Light/isLightForceEnabled)="true"'
+              name: 'Light Currently Force Enabled'
+              priority: INFO
+              dependencies:
+                - name: 'Light Force Enabled from {$TRIGGER_LIGHTFORCEENABLED_CONNETING_WARNING}'
+                  expression: 'last(/UniFi Protect API - Light/isLightForceEnabled,{$TRIGGER_LIGHTFORCEENABLED_CONNETING_WARNING})="CONNECTING"'
+            - uuid: a2ea486b064841abbe28ca63204928e1
+              expression: 'last(/UniFi Protect API - Light/isLightForceEnabled,{$TRIGGER_LIGHTFORCEENABLED_CONNETING_WARNING})="CONNECTING"'
+              name: 'Light Force Enabled from {$TRIGGER_LIGHTFORCEENABLED_CONNETING_WARNING}'
+              priority: WARNING
+        - uuid: 0a7eab7191a248f1a169c455cd8d79aa
+          name: 'Is Pir Motion Detected'
+          type: DEPENDENT
+          key: isPirMotionDetected
+          delay: '0'
+          history: '{$ITEM_ISPIRMOTIONDETECTED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether the light PIR is currently detecting motion'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.isPirMotionDetected
+          master_item:
+            key: detail.json
+        - uuid: 6f117b448fe544eaaaa5c210f5b1d775
+          name: 'Last Detected Motion'
+          type: DEPENDENT
+          key: lastMotion
+          delay: '0'
+          history: '{$ITEM_LASTMOTION_HISTORY}'
+          trends: '0'
+          units: unixtime
+          description: 'Unix timestamp of the last time the PIR motion-detection was triggered.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.lastMotion
+          master_item:
+            key: detail.json
+        - uuid: 698de255262842b8b82abf62152182b3
+          name: 'Light Device Settings'
+          type: DEPENDENT
+          key: lightDeviceSettings
+          delay: '0'
+          history: '{$ITEM_LIGHTDEVICESETTINGS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Settings for when and how your light gets activated'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.lightDeviceSettings
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: e1d981414aaf482d9cbfd2063994209c
+              expression: 'change(/UniFi Protect API - Light/lightDeviceSettings)=1'
+              name: 'Light Device Settings was Changed'
+              priority: INFO
+        - uuid: cf890cff9f6a439e917ed7e34b8ba5f5
+          name: 'Light Mode Settings'
+          type: DEPENDENT
+          key: lightModeSettings
+          delay: '0'
+          history: '{$ITEM_LIGHTMODESETTINGS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Settings for when and how your light gets activated'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.lightModeSettings
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 21f3fedb357a42f1ac46c69b19bb42a7
+              expression: 'change(/UniFi Protect API - Light/lightModeSettings)=1'
+              name: 'Light Mode Settings was Changed'
+              priority: INFO
+        - uuid: 19e6be75a8fd4544913995e5bde9926a
+          name: State
+          type: DEPENDENT
+          key: state
+          delay: '0'
+          history: '{$ITEM_STATE_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Connection state of the device.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.state
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 7f2320d455484c56b58fc7f44a4d26cf
+              expression: 'last(/UniFi Protect API - Light/state)="CONNECTING"'
+              name: 'State is "CONNECTING"'
+              priority: INFO
+              dependencies:
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+                  expression: 'last(/UniFi Protect API - Light/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_WARNING}'
+                  expression: 'last(/UniFi Protect API - Light/state,{$TRIGGER_STATE_CONNETING_WARNING})="CONNECTING"'
+            - uuid: c9d2f58f8be8498eae140f961552a6ca
+              expression: 'last(/UniFi Protect API - Light/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+              name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+              priority: HIGH
+            - uuid: 1332681775c9499ab6af3ba4f5f6c124
+              expression: 'last(/UniFi Protect API - Light/state,{$TRIGGER_STATE_CONNETING_WARNING})="CONNECTING"'
+              name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_WARNING}'
+              priority: WARNING
+              dependencies:
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+                  expression: 'last(/UniFi Protect API - Light/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+            - uuid: bfad4462c28b49aa93e030111796568d
+              expression: 'last(/UniFi Protect API - Light/state)="DISCONNECTED"'
+              name: 'State is "DISCONNECTED"'
+              priority: HIGH
+      macros:
+        - macro: '{$ITEM_DETAIL.JSON_UPDATE}'
+          value: 10m
+          description: 'Item ''detail.json'' Update Interval'
+        - macro: '{$ITEM_ISDARK_HISTORY}'
+          value: 7d
+          description: 'Item ''isDark'' History'
+        - macro: '{$ITEM_ISLIGHTFORCEDENABLED}'
+          value: 7d
+          description: 'Item ''isLightForceEnabled'' History'
+        - macro: '{$ITEM_ISLIGHTON_HISTORY}'
+          value: 7d
+          description: 'Item ''isLightOn'' History'
+        - macro: '{$ITEM_ISPIRMOTIONDETECTED_HISTORY}'
+          value: 7d
+          description: 'Item ''isPirMotionDetected'' History'
+        - macro: '{$ITEM_LASTMOTION_HISTORY}'
+          description: 'Item ''lastMotion'' History'
+        - macro: '{$ITEM_LIGHTDEVICESETTINGS_HISTORY}'
+          value: 7d
+          description: 'Item ''lightDeviceSettings'' History'
+        - macro: '{$ITEM_LIGHTMODESETTINGS_HISTORY}'
+          value: 7d
+          description: 'Item ''lightModeSettings'' History'
+        - macro: '{$ITEM_STATE_HISTORY}'
+          value: 7d
+          description: 'Item ''state'' History'
+        - macro: '{$TRIGGER_LIGHTFORCEENABLED_CONNETING_WARNING}'
+          value: 24h
+          description: 'Trigger ''Light Force Enabled from {$TRIGGER_LIGHTFORCEENABLED_CONNETING_WARNING}'''
+        - macro: '{$TRIGGER_STATE_CONNETING_HIGH}'
+          value: 1h
+          description: 'Trigger ''State is "CONNECTING" from {$TRIGGER_STATE_CONNETING_HIGH}'''
+        - macro: '{$TRIGGER_STATE_CONNETING_WARNING}'
+          value: 30m
+          description: 'Trigger ''State is "CONNECTING" from {$TRIGGER_STATE_CONNETING_WARNING}'''
+    - uuid: d176f20b5c5e4ab68758bd368fe69643
+      template: 'UniFi Protect API - Sensor'
+      name: 'UniFi Protect API - Sensor'
+      groups:
+        - name: 'Templates/Video surveillance'
+      items:
+        - uuid: 8f6e9b4fc7d0415abb68d7e11bb990cc
+          name: 'Alarm Settings'
+          type: DEPENDENT
+          key: alarmSettings
+          delay: '0'
+          history: '{$ITEM_ALARMSETTINGS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Smoke and carbon monoxide alarm sensor settings.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.alarmSettings
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 8a27800a55ac4f0e8b19fd9318dfd375
+              expression: 'change(/UniFi Protect API - Sensor/alarmSettings)=1'
+              name: 'Alarm Settings was Changed'
+              priority: INFO
+        - uuid: 967338908146438e98af8cc2ef3707f4
+          name: 'Alarm Triggered At'
+          type: DEPENDENT
+          key: alarmTriggeredAt
+          delay: '0'
+          history: '{$ITEM_ALARMTRIGGEREDAT_HISTORY}'
+          trends: '{$ITEM_ALARMTRIGGEREDAT_TRENDS}'
+          units: unixtime
+          description: 'Unix timestamp when the smoke or carbon monoxide alarm was triggered, nullable.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.alarmTriggeredAt
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+        - uuid: b3d045c6615d4badb999dedd1dd4d471
+          name: 'Battery Is Low'
+          type: DEPENDENT
+          key: batteryStatus.isLow
+          delay: '0'
+          history: '{$ITEM_BATTERYISLOW_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Low battery charge level flag.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.batteryStatus.isLow
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: ca9e15d114264644ae6be023b770274d
+              expression: 'last(/UniFi Protect API - Sensor/batteryStatus.isLow)="true"'
+              name: 'Battery Is Low'
+              priority: AVERAGE
+        - uuid: ff472dc5fbc94144a16397fc9908bab8
+          name: 'Battery Percentage'
+          type: DEPENDENT
+          key: batteryStatus.percentage
+          delay: '0'
+          history: '{$ITEM_BATTERYPERCENTEGE_HISTORY}'
+          trends: '{$ITEM_BATTERYPERCENTEGE_TRENDS}'
+          units: '%'
+          description: 'Battery charge level from 0 to 100 (%).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.batteryStatus.percentage
+          master_item:
+            key: detail.json
+        - uuid: 72efdd5ead9d4347beeaa7c749627f9f
+          name: 'Detail JSON'
+          type: HTTP_AGENT
+          key: detail.json
+          delay: '{$ITEM_DETAIL.JSON_UPDATE}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          url: 'https://{$UNIFI_PROTECT_API_ADDRESS}/proxy/protect/integration/v1/sensors/{HOST.HOST}'
+          headers:
+            - name: Accept
+              value: application/json
+            - name: X-API-KEY
+              value: '{$UNIFI_PROTECT_API_KEY}'
+          tags:
+            - tag: data
+              value: raw
+        - uuid: 5d62e74422fd4623a547239c2a355e51
+          name: 'External Leak Detected At'
+          type: DEPENDENT
+          key: externalLeakDetectedAt
+          delay: '0'
+          history: '{$ITEM_EXTERNALLEAKDETECTEDAT_HISTORY}'
+          trends: '{$ITEM_EXTERNALLEAKDETECTEDAT_TRENDS}'
+          units: unixtime
+          description: 'Unix timestamp when the sensor detected an external water leak, nullable.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.externalLeakDetectedAt
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+        - uuid: ad17a41d02014b44a61469681bc35cee
+          name: 'Humidity Settings'
+          type: DEPENDENT
+          key: humiditySettings
+          delay: '0'
+          history: '{$ITEM_HUMIDITYSETTINGS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Relative humidity sensor settings.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.humiditySettings
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: e6e14f4fbebe4157ac0eeae6ab61e253
+              expression: 'change(/UniFi Protect API - Sensor/humiditySettings)=1'
+              name: 'Humidity Settings was Changed'
+              priority: INFO
+        - uuid: 0ce9f1b38f33449fb837bccce56c6757
+          name: 'Is Motion Detected'
+          type: DEPENDENT
+          key: isMotionDetected
+          delay: '0'
+          history: '{$ITEM_ISMOTIONDETECTED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether sensor is currently detecting the motion.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.isMotionDetected
+          master_item:
+            key: detail.json
+        - uuid: 371aa62002fc4aad86862a5e937837c6
+          name: 'Is Opened'
+          type: DEPENDENT
+          key: isOpened
+          delay: '0'
+          history: '{$ITEM_ISOPENED_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Whether the door/window/garage is opened.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.isOpened
+          master_item:
+            key: detail.json
+        - uuid: 953de707c79e461f9a7ade2ddfc9e666
+          name: 'Leak Detected At'
+          type: DEPENDENT
+          key: leakDetectedAt
+          delay: '0'
+          history: '{$ITEM_LEAKDETECTEDAT_HISTORY}'
+          trends: '{$ITEM_LEAKDETECTEDAT_TRENDS}'
+          units: unixtime
+          description: 'Unix timestamp when the sensor detected a water leak, nullable.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.leakDetectedAt
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+        - uuid: f7855dd2d88f46c98544d05c88984ee6
+          name: 'Light Settings'
+          type: DEPENDENT
+          key: lightSettings
+          delay: '0'
+          history: '{$ITEM_LIGHTSETTINGS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Ambient light sensor settings.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.lightSettings
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 5f196a968392411b8a159d6847e6bf2f
+              expression: 'change(/UniFi Protect API - Sensor/lightSettings)=1'
+              name: 'Light Settings was Changed'
+              priority: INFO
+        - uuid: 2119b87aa159471dbe85104d4e1af137
+          name: 'Motion Detected At'
+          type: DEPENDENT
+          key: motionDetectedAt
+          delay: '0'
+          history: '{$ITEM_MOTIONDETECTEDAT_HISTORY}'
+          trends: '{$ITEM_MOTIONDETECTEDAT_TRENDS}'
+          units: unixtime
+          description: 'Unix timestamp when the last motion was detected.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.motionDetectedAt
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+        - uuid: 5df55d7faeb5481ab9332ee4ef403613
+          name: 'Motion Settings'
+          type: DEPENDENT
+          key: motionSettings
+          delay: '0'
+          history: '{$ITEM_MOTIONSETTINGS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Motion sensor settings.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.motionSettings
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 0be73722c29746e88ce61ec85baf5c28
+              expression: 'change(/UniFi Protect API - Sensor/motionSettings)=1'
+              name: 'Motion Settings was Changed'
+              priority: INFO
+        - uuid: 1e6f856f204f4409b7b72e322284fb3e
+          name: 'Mount Type'
+          type: DEPENDENT
+          key: mountType
+          delay: '0'
+          history: '{$ITEM_MOUNTTYPE_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Mounting type of the sensor.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.mountType
+          master_item:
+            key: detail.json
+        - uuid: d2df04b3d9ef444fbf3f39ca77af9717
+          name: 'Open Status Changed At'
+          type: DEPENDENT
+          key: openStatusChangedAt
+          delay: '0'
+          history: '{$ITEM_OPENSTATUSCHANGEDAT_HISTORY}'
+          trends: '{$ITEM_OPENSTATUSCHANGEDAT_TRENDS}'
+          units: unixtime
+          description: 'Unix timestamp when the door/window/garage was last opened or closed, nullable.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.openStatusChangedAt
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+        - uuid: 78c46869260946fbbb7cac02133055e2
+          name: State
+          type: DEPENDENT
+          key: state
+          delay: '0'
+          history: '{$ITEM_STATE_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Connection state of the device.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.state
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 87c1db3ddec244c4a2682e3501d60a81
+              expression: 'last(/UniFi Protect API - Sensor/state)="CONNECTING"'
+              name: 'State is "CONNECTING"'
+              priority: INFO
+              dependencies:
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+                  expression: 'last(/UniFi Protect API - Sensor/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_WARNING}'
+                  expression: 'last(/UniFi Protect API - Sensor/state,{$TRIGGER_STATE_CONNETING_WARNING})="CONNECTING"'
+            - uuid: e8414c746b004120bc9961bee844eac3
+              expression: 'last(/UniFi Protect API - Sensor/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+              name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+              priority: HIGH
+            - uuid: 4923870a4f8a4d729cb3973eac7427d5
+              expression: 'last(/UniFi Protect API - Sensor/state,{$TRIGGER_STATE_CONNETING_WARNING})="CONNECTING"'
+              name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_WARNING}'
+              priority: WARNING
+              dependencies:
+                - name: 'State is "CONNETING" from {$TRIGGER_STATE_CONNETING_HIGH}'
+                  expression: 'last(/UniFi Protect API - Sensor/state,{$TRIGGER_STATE_CONNETING_HIGH})="CONNECTING"'
+            - uuid: 96f711d694e346239f55c0b449cff111
+              expression: 'last(/UniFi Protect API - Sensor/state)="DISCONNECTED"'
+              name: 'State is "DISCONNECTED"'
+              priority: HIGH
+        - uuid: 8f59f6d8f4624f35ae968c53a9732efd
+          name: 'Stats Humidity Status'
+          type: DEPENDENT
+          key: stats.humidity.status
+          delay: '0'
+          history: '{$ITEM_STATSHUMIDITYSTATUS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'What range does the measured metric fall into'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.humidity.status
+          master_item:
+            key: detail.json
+        - uuid: 506a5235a3344536b087e4596f60941a
+          name: 'Stats Humidity Value'
+          type: DEPENDENT
+          key: stats.humidity.value
+          delay: '0'
+          history: '{$ITEM_STATSHUMIDITYVALUE_HISTORY}'
+          trends: '{$ITEM_STATSHUMIDITYVALUE_TRENDS}'
+          units: '%'
+          description: 'Ambient light value (Lux).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.humidity.value
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+        - uuid: 402a608c3549457c8e3a8062c488c598
+          name: 'Stats Light Status'
+          type: DEPENDENT
+          key: stats.light.status
+          delay: '0'
+          history: '{$ITEM_STATSLIGHTSTATUS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'What range does the measured metric fall into'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.light.status
+          master_item:
+            key: detail.json
+        - uuid: f16ef95632024af080a75c1528dff98a
+          name: 'Stats Light Value'
+          type: DEPENDENT
+          key: stats.light.value
+          delay: '0'
+          history: '{$ITEM_STATSLIGHTVALUE_HISTORY}'
+          trends: '{$ITEM_STATSLIGHTVALUE_TRENDS}'
+          units: Lux
+          description: 'Ambient light value (Lux).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.light.status
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+        - uuid: 90e38a3a20fa4988955f763591ffb16b
+          name: 'Stats Temperature Status'
+          type: DEPENDENT
+          key: stats.temperature.status
+          delay: '0'
+          history: '{$ITEM_STATSTEMPERATURESTATUS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'What range does the measured metric fall into'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.temperature.status
+          master_item:
+            key: detail.json
+        - uuid: bf89ed94602b47608c6b9f8a492c19f1
+          name: 'Stats Temperature Value'
+          type: DEPENDENT
+          key: stats.temperature.value
+          delay: '0'
+          history: '{$ITEM_STATSTEMPERATUREVALUE_HISTORY}'
+          trends: '{$ITEM_STATSTEMPERATUREVALUE_TRENDS}'
+          units: C
+          description: 'Ambient light value (Lux).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.temperature.value
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+        - uuid: f386afa3d5734d9f8cb9930f938c9404
+          name: 'Tampering Detected At'
+          type: DEPENDENT
+          key: tamperingDetectedAt
+          delay: '0'
+          history: '{$ITEM_TAMPERINGDETECTEDAT_HISTORY}'
+          trends: '{$ITEM_TAMPERINGDETECTEDAT_TRENDS}'
+          units: unixtime
+          description: 'Unix timestamp when the sensor detected tampering, nullable.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.tamperingDetectedAt
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
+          master_item:
+            key: detail.json
+        - uuid: 1034cc2c287d4b0da3247e88268c16e2
+          name: 'Temperature Settings'
+          type: DEPENDENT
+          key: temperatureSettings
+          delay: '0'
+          history: '{$ITEM_TEMPERATURESETTINGS_HISTORY}'
+          value_type: TEXT
+          trends: '0'
+          description: 'Temperature sensor settings.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.temperatureSettings
+          master_item:
+            key: detail.json
+          triggers:
+            - uuid: 5a0640138a5c4c12bef7a07155936f11
+              expression: 'change(/UniFi Protect API - Sensor/temperatureSettings)=1'
+              name: 'Temperature Settings was Changed'
+              priority: INFO
+      macros:
+        - macro: '{$ITEM_ALARMSETTINGS_HISTORY}'
+          value: 7d
+          description: 'Item ''alarmSettings'' History'
+        - macro: '{$ITEM_ALARMTRIGGEREDAT_HISTORY}'
+          value: 7d
+          description: 'Item ''alarmTriggeredAt'' History'
+        - macro: '{$ITEM_ALARMTRIGGEREDAT_TRENDS}'
+          value: 365d
+          description: 'Item ''alarmTriggeredAt'' Trends'
+        - macro: '{$ITEM_BATTERYISLOW_HISTORY}'
+          value: 7d
+          description: 'Item ''batteryStatus.isLow'' History'
+        - macro: '{$ITEM_BATTERYPERCENTEGE_HISTORY}'
+          value: 7d
+          description: 'Item ''batteryStatus.percentage'' History'
+        - macro: '{$ITEM_BATTERYPERCENTEGE_TREND}'
+          value: 365d
+          description: 'Item ''batteryStatus.percentage'' Trend'
+        - macro: '{$ITEM_DETAIL.JSON_UPDATE}'
+          value: 10m
+          description: 'Item ''detail.json'' Update Interval'
+        - macro: '{$ITEM_EXTERNALLEAKTRIGGEREDAT_HISTORY}'
+          value: 7d
+          description: 'Item ''externalLeakTriggeredAt'' History'
+        - macro: '{$ITEM_EXTERNALLEAKTRIGGEREDAT_TRENDS}'
+          value: 365d
+          description: 'Item ''externalLeakTriggeredAt'' Trends'
+        - macro: '{$ITEM_HUMIDITYSETTINGS_HISTORY}'
+          value: 7d
+          description: 'Item ''humiditySettings'' History'
+        - macro: '{$ITEM_ISMOTIONDETECTED_HISTORY}'
+          value: 7d
+          description: 'Item ''isMotionDetected'' History'
+        - macro: '{$ITEM_ISOPENED_HISTORY}'
+          value: 7d
+          description: 'Item ''isOpened'' History'
+        - macro: '{$ITEM_LEAKTRIGGEREDAT_HISTORY}'
+          value: 7d
+          description: 'Item ''leakTriggeredAt'' History'
+        - macro: '{$ITEM_LEAKTRIGGEREDAT_TRENDS}'
+          value: 365d
+          description: 'Item ''leakTriggeredAt'' Trends'
+        - macro: '{$ITEM_LIGHTSETTINGS_HISTORY}'
+          value: 7d
+          description: 'Item ''lightSettings'' History'
+        - macro: '{$ITEM_MOTIONDETECTEDAT_HISTORY}'
+          value: 7d
+          description: 'Item ''motionDetectedAt'' History'
+        - macro: '{$ITEM_MOTIONDETECTEDAT_TRENDS}'
+          value: 365d
+          description: 'Item ''motionDetectedAt'' Trends'
+        - macro: '{$ITEM_MOTIONSETTINGS_HISTORY}'
+          value: 7d
+          description: 'Item ''motionSettings'' History'
+        - macro: '{$ITEM_MOUNTTYPE_HISTORY}'
+          value: 7d
+          description: 'Item ''mountType'' History'
+        - macro: '{$ITEM_OPENSTATUSCHANGEDAT_HISTORY}'
+          value: 7d
+          description: 'Item ''openStatusChangedAt'' History'
+        - macro: '{$ITEM_OPENSTATUSCHANGEDAT_TRENDS}'
+          value: 365d
+          description: 'Item ''openStatusChangedAt'' Trends'
+        - macro: '{$ITEM_STATE_HISTORY}'
+          value: 7d
+          description: 'Item ''state'' History'
+        - macro: '{$ITEM_STATSHUMIDITYSTATUS_HISTORY}'
+          value: 7d
+          description: 'Item ''stats.humidity.status'' History'
+        - macro: '{$ITEM_STATSHUMIDITYVALUE_HISTORY}'
+          value: 7d
+          description: 'Item ''stats.humidity.value'' History'
+        - macro: '{$ITEM_STATSHUMIDITYVALUE_TRENDS}'
+          value: 365d
+          description: 'Item ''stats.humidity.value'' Trends'
+        - macro: '{$ITEM_STATSLIGHTSTATUS_HISTORY}'
+          value: 7d
+          description: 'Item ''stats.light.status'' History'
+        - macro: '{$ITEM_STATSLIGHTVALUE_HISTORY}'
+          value: 7d
+          description: 'Item ''stats.light.value'' History'
+        - macro: '{$ITEM_STATSLIGHTVALUE_TRENDS}'
+          value: 365d
+          description: 'Item ''stats.light.value'' Trends'
+        - macro: '{$ITEM_STATSTEMPERATURESTATUS_HISTORY}'
+          value: 7d
+          description: 'Item ''stats.temperature.status'' History'
+        - macro: '{$ITEM_STATSTEMPERATUREVALUE_HISTORY}'
+          value: 7d
+          description: 'Item ''stats.temperature.value'' History'
+        - macro: '{$ITEM_STATSTEMPERATUREVALUE_TRENDS}'
+          value: 365d
+          description: 'Item ''stats.temperature.value'' Trends'
+        - macro: '{$ITEM_TAMPERINGDETECTEDAT_HISTORY}'
+          value: 7d
+          description: 'Item ''tamperingDetectedAt'' History'
+        - macro: '{$ITEM_TAMPERINGDETECTEDAT_TRENDS}'
+          value: 365d
+          description: 'Item ''tamperingDetectedAt'' Trends'
+        - macro: '{$ITEM_TEMPERATURESETTINGS_HISTORY}'
+          value: 7d
+          description: 'Item ''temperatureSettings'' History'
+        - macro: '{$TRIGGER_STATE_CONNETING_HIGH}'
+          value: 1h
+          description: 'Trigger ''State is "CONNECTING" from {$TRIGGER_STATE_CONNETING_HIGH}'''
+        - macro: '{$TRIGGER_STATE_CONNETING_WARNING}'
+          value: 30m
+          description: 'Trigger ''State is "CONNECTING" from {$TRIGGER_STATE_CONNETING_WARNING}'''
