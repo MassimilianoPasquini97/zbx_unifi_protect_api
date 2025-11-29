@@ -1,12 +1,15 @@
 <p align="center">
-    <img src="docs/image/logo.avif" height="128">
+    <img src="docs/image/logo.avif" height="128" alt="Zabbix + UniFi Protect logo">
     <h1 align="center">UniFi Protect Zabbix Template</h1>
 </p>
 
-This template, designed for monitoring the UniFi Protect application via the official API, is community‑driven and not affiliated with Ubiquiti Networks.
+Zabbix template for monitor the UniFi Protect application via the official API.
+
+> [!NOTE]
+> Community‑driven and not affiliated with Ubiquiti Networks.
 
 > [!WARNING]
-> It has been tested on API version 6.1.78; preview releases have not been tested.
+> It has been tested on UniFi Protect Application 6.1.78, previous releases have not been tested.
 
 > [!IMPORTANT]
 > Only Zabbix LTS versions are officially supported starting from 7.0. You can use an unsupported version by changing the Zabbix Release in the template file.
